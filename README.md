@@ -1,5 +1,7 @@
 # 🏆 APEX PREMIER LEAGUE - SPORTS LEAGUE MANAGEMENT PLATFORM
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nksingh2013/sports-league-platform)
+
 A complete, modern, database-connected Sports League Management Platform built with **Python Flask**, **SQLite**, **Vanilla JavaScript**, and high-performance **HTML5/CSS3** responsive styling.
 
 Inspired by premier digital sports platforms (**ESPN**, **FIFA**, **Premier League**, and modern sports analytics dashboards), the system delivers a stadium-inspired dark navy aesthetic, electric green accents, fluid sports animations, and a secure relational management back-office.
