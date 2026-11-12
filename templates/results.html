@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Match Results | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Match Results</h2>
+            <p>Official verified final scores and match summaries</p>
+        </div>
+        {% if is_admin %}
+            <a href="{{ url_for('admin_results') }}" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+                + Record / Update Result
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="GET" action="{{ url_for('results') }}" class="filter-bar">
+        <select name="team_id" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Teams</option>
+            {% for t in teams %}
+                <option value="{{ t.id }}" {% if selected_team == t.id %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="round" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Matchday Rounds</option>
+            {% for r in rounds %}
+                <option value="{{ r.round }}" {% if selected_round == r.round %}selected{% endif %}>Round {{ r.round }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.85rem;">Filter</button>
+        {% if selected_team or selected_round %}
+            <a href="{{ url_for('results') }}" class="btn-secondary" style="padding: 0.65rem 1rem; font-size: 0.85rem;">Reset</a>
+        {% endif %}
+    </form>
+
+    <!-- Results Cards -->
+    <div class="fixtures-grid">
+        {% for m in results %}
+        <div class="glass-card match-card">
+            <div class="match-header">
+                <span>Round {{ m.round }} FT</span>
+                <span class="match-status-badge badge-completed">COMPLETED</span>
+            </div>
+
+            <div class="match-teams-row">
+                <div class="match-team team-home">
+                    <span class="match-team-name" style="{% if m.home_score > m.away_score %}color:var(--accent-green);font-weight:800;{% endif %}">
+                        {{ m.home_short }}
+                    </span>
+                    <img src="{{ m.home_logo }}" alt="{{ m.home_name }}" class="match-team-logo" loading="lazy">
+                </div>
+
+                <div class="match-scoreboard">
+                    <div class="score-display">{{ m.home_score }} - {{ m.away_score }}</div>
+                    <span style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
+                        {% if m.home_score > m.away_score %}
+                            {{ m.home_short }} Won
+                        {% elif m.away_score > m.home_score %}
+                            {{ m.away_short }} Won
+                        {% else %}
+                            Drawn
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="match-team team-away">
+                    <img src="{{ m.away_logo }}" alt="{{ m.away_name }}" class="match-team-logo" loading="lazy">
+                    <span class="match-team-name" style="{% if m.away_score > m.home_score %}color:var(--accent-green);font-weight:800;{% endif %}">
+                        {{ m.away_short }}
+                    </span>
+                </div>
+            </div>
+
+            {% if m.summary %}
+            <div style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(5,10,20,0.5); padding: 0.75rem; border-radius: 6px; line-height: 1.45;">
+                {{ m.summary }}
+            </div>
+            {% endif %}
+
+            <div class="match-footer">
+                <div class="match-venue">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{{ m.venue_name }}</span>
+                </div>
+                <span>{{ m.match_date|format_date }}</span>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);" class="glass-card">
+            <h3>No completed matches found.</h3>
+            <p style="margin-top: 0.5rem;"><a href="{{ url_for('results') }}" style="color:var(--accent-green);">View all results</a></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

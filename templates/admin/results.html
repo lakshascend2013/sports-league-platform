@@ -1,0 +1,141 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Match Results & Live Scorekeeping{% endblock %}
+
+{% block admin_content %}
+<div class="admin-action-bar">
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800;">Scorekeeping & Result Certification</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+            Entering or editing scores automatically updates the league standings, goal difference, and team form in real-time.
+        </p>
+    </div>
+</div>
+
+<!-- Matches Table for Result Entry -->
+<div class="table-container">
+    <div class="table-scroll-wrapper">
+        <table class="data-table mobile-stacked-table">
+            <thead>
+                <tr>
+                    <th>Match ID</th>
+                    <th>Matchup</th>
+                    <th>Date & Venue</th>
+                    <th>Status</th>
+                    <th>Current Score</th>
+                    <th>Minute</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in matches %}
+                <tr>
+                    <td data-label="ID">
+                        <strong style="color: var(--text-muted); font-family: var(--font-mono);">#{{ m.id }}</strong>
+                    </td>
+                    <td data-label="Matchup">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="{{ m.home_logo }}" alt="{{ m.home_name }}" style="width: 24px; height: 24px; border-radius: 50%;">
+                            <span style="font-weight: 700;">{{ m.home_short }}</span>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">vs</span>
+                            <span style="font-weight: 700;">{{ m.away_short }}</span>
+                            <img src="{{ m.away_logo }}" alt="{{ m.away_name }}" style="width: 24px; height: 24px; border-radius: 50%;">
+                        </div>
+                    </td>
+                    <td data-label="Date & Venue">
+                        <span style="color: var(--accent-cyan);">{{ m.match_date|format_date }}</span>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ m.venue_name }}</div>
+                    </td>
+                    <td data-label="Status">
+                        <span class="match-status-badge {% if m.status == 'live' %}badge-live{% elif m.status == 'completed' %}badge-completed{% else %}badge-scheduled{% endif %}">
+                            {{ m.status|upper }}
+                        </span>
+                    </td>
+                    <td data-label="Score">
+                        <span style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 900; color: {% if m.status == 'live' %}var(--accent-green){% else %}#ffffff{% endif %};">
+                            {{ m.home_score }} - {{ m.away_score }}
+                        </span>
+                    </td>
+                    <td data-label="Minute">
+                        {% if m.status == 'live' %}
+                            <strong style="color: var(--accent-red);">{{ m.minute }}'</strong>
+                        {% elif m.status == 'completed' %}
+                            <span style="color: var(--text-muted);">90' (FT)</span>
+                        {% else %}
+                            <span style="color: var(--text-muted);">-</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Action" style="text-align: right;">
+                        <button type="button" class="btn-action-sm btn-edit btn-update-result"
+                            data-id="{{ m.id }}"
+                            data-home-name="{{ m.home_name }}"
+                            data-away-name="{{ m.away_name }}"
+                            data-home-score="{{ m.home_score }}"
+                            data-away-score="{{ m.away_score }}"
+                            data-status="{{ m.status }}"
+                            data-minute="{{ m.minute }}"
+                            data-summary="{{ m.summary }}">
+                            Record Score
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL: UPDATE SCORE & RESULT -->
+<div class="modal-overlay" id="updateResultModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Record / Update Match Score</h3>
+            <button type="button" class="modal-close-btn" data-close-modal>&times;</button>
+        </div>
+        <form method="POST" id="updateResultForm" action="">
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 1.5rem; background: rgba(5,10,20,0.8); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Match Encounter</div>
+                    <div id="res_modal_teams" style="font-size: 1.15rem; font-weight: 800; color: #ffffff; margin-top: 4px;">Teams</div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group" style="text-align: center;">
+                        <label>Home Score *</label>
+                        <input type="number" id="res_home_score" name="home_score" class="form-control" style="font-size: 1.5rem; font-weight: 900; text-align: center; font-family: var(--font-mono);" min="0" required>
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                        <label>Away Score *</label>
+                        <input type="number" id="res_away_score" name="away_score" class="form-control" style="font-size: 1.5rem; font-weight: 900; text-align: center; font-family: var(--font-mono);" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Match Status *</label>
+                        <select id="res_status" name="status" class="form-control" required>
+                            <option value="completed">Completed (Full Time)</option>
+                            <option value="live">Live In-Play</option>
+                            <option value="scheduled">Scheduled (Pending)</option>
+                            <option value="postponed">Postponed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Match Minute (0 - 120)</label>
+                        <input type="number" id="res_minute" name="minute" class="form-control" min="0" max="120" value="90">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Match Summary / Goalscorers Narrative</label>
+                    <textarea id="res_summary" name="summary" class="form-control" rows="3" placeholder="Describe key events, goalscorers, or red cards..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-primary">Certify & Save Result</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

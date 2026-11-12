@@ -1,0 +1,176 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Manage Venues & Stadiums{% endblock %}
+
+{% block admin_content %}
+<div class="admin-action-bar">
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800;">Championship Stadium Venues</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">Total registered stadiums: {{ venues|length }}</p>
+    </div>
+    <button type="button" class="btn-add" data-open-modal="addVenueModal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add New Stadium
+    </button>
+</div>
+
+<!-- Venues Table -->
+<div class="table-container">
+    <div class="table-scroll-wrapper">
+        <table class="data-table mobile-stacked-table">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Stadium Name</th>
+                    <th>City / Location</th>
+                    <th>Capacity</th>
+                    <th>Surface</th>
+                    <th>Matches Hosted</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in venues %}
+                <tr>
+                    <td data-label="Photo">
+                        <img src="{{ v.image_url }}" alt="{{ v.name }}" style="width: 48px; height: 32px; border-radius: 4px; object-fit: cover;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80';">
+                    </td>
+                    <td data-label="Stadium">
+                        <strong style="color: #ffffff;">{{ v.name }}</strong>
+                    </td>
+                    <td data-label="City">{{ v.city }}</td>
+                    <td data-label="Capacity">
+                        <strong style="color: var(--accent-cyan);">{{ '{:,}'.format(v.capacity) }}</strong>
+                    </td>
+                    <td data-label="Surface">{{ v.surface }}</td>
+                    <td data-label="Matches Hosted">
+                        <span style="color: var(--accent-green); font-weight: 700;">{{ v.match_count }}</span>
+                    </td>
+                    <td data-label="Actions" style="text-align: right;">
+                        <div style="display: inline-flex; gap: 8px;">
+                            <button type="button" class="btn-action-sm btn-edit btn-edit-venue"
+                                data-id="{{ v.id }}"
+                                data-name="{{ v.name }}"
+                                data-city="{{ v.city }}"
+                                data-capacity="{{ v.capacity }}"
+                                data-surface="{{ v.surface }}"
+                                data-image-url="{{ v.image_url }}"
+                                data-desc="{{ v.description }}">
+                                Edit
+                            </button>
+                            <form method="POST" action="{{ url_for('admin_delete_venue', venue_id=v.id) }}" style="display: inline;" data-confirm-delete="Delete venue {{ v.name }}?">
+                                <button type="submit" class="btn-action-sm btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        No stadiums registered.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL: ADD VENUE -->
+<div class="modal-overlay" id="addVenueModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Championship Stadium</h3>
+            <button type="button" class="modal-close-btn" data-close-modal>&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('admin_venues') }}">
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Stadium Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Apex Olympic Stadium" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City / Region *</label>
+                        <input type="text" name="city" class="form-control" placeholder="e.g. London" required>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Spectator Capacity *</label>
+                        <input type="number" name="capacity" class="form-control" placeholder="e.g. 60000" min="1000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pitch Surface</label>
+                        <input type="text" name="surface" class="form-control" value="Natural Grass">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Stadium Photo URL</label>
+                    <input type="url" name="image_url" class="form-control" placeholder="https://..." value="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80">
+                </div>
+
+                <div class="form-group">
+                    <label>Stadium Description & Features</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Facilities, lighting, historic significance..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-primary">Save Stadium</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: EDIT VENUE -->
+<div class="modal-overlay" id="editVenueModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Stadium Details</h3>
+            <button type="button" class="modal-close-btn" data-close-modal>&times;</button>
+        </div>
+        <form method="POST" id="editVenueForm" action="">
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Stadium Name *</label>
+                        <input type="text" id="edit_venue_name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="edit_venue_city" name="city" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Capacity *</label>
+                        <input type="number" id="edit_venue_capacity" name="capacity" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pitch Surface</label>
+                        <input type="text" id="edit_venue_surface" name="surface" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Photo URL</label>
+                    <input type="url" id="edit_venue_image_url" name="image_url" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="edit_venue_desc" name="description" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-primary">Update Stadium</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

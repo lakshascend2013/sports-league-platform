@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Control Panel{% endblock %} | {{ league_name }}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <!-- Collapsible Admin Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <div class="brand-crest" style="width: 36px; height: 36px;">
+                    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: #050a14;">
+                        <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div style="font-weight: 800; font-size: 0.95rem; text-transform: uppercase;">APEX CONTROL</div>
+                    <div style="font-size: 0.7rem; color: var(--accent-green); font-weight: 600;">PORTAL ENGINE</div>
+                </div>
+            </div>
+
+            <ul class="admin-nav">
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_teams') }}" class="{% if request.endpoint in ['admin_teams', 'admin_edit_team'] %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Manage Teams
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_players') }}" class="{% if request.endpoint in ['admin_players', 'admin_edit_player'] %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        Manage Players
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_fixtures') }}" class="{% if request.endpoint in ['admin_fixtures', 'admin_edit_fixture'] %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        Manage Fixtures
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_results') }}" class="{% if request.endpoint in ['admin_results', 'admin_update_result'] %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        Match Results & Scores
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_venues') }}" class="{% if request.endpoint in ['admin_venues', 'admin_edit_venue'] %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"></path></svg>
+                        Venues & Stadiums
+                    </a>
+                </li>
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('admin_seasons') }}" class="{% if request.endpoint == 'admin_seasons' %}active{% endif %}">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Manage Seasons
+                    </a>
+                </li>
+                
+                <li style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-glass);"></li>
+                
+                <li class="admin-nav-item">
+                    <a href="{{ url_for('index') }}" target="_blank">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        View Public Website
+                    </a>
+                </li>
+            </ul>
+
+            <div class="admin-sidebar-footer">
+                <div class="admin-user-info">
+                    <div class="admin-avatar">{{ admin_username[0]|upper if admin_username else 'A' }}</div>
+                    <div class="admin-details">
+                        <div class="admin-name">{{ admin_name or admin_username }}</div>
+                        <div class="admin-role">Super Admin</div>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn-secondary" style="width: 100%; justify-content: center; padding: 0.4rem; font-size: 0.8rem;">
+                    Sign Out
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div class="admin-topbar-left">
+                    <button class="sidebar-toggle-btn" id="adminSidebarToggle" aria-label="Toggle navigation sidebar">
+                        &#9776;
+                    </button>
+                    <h2 style="font-size: 1.15rem; font-weight: 800;">{% block page_title %}Dashboard{% endblock %}</h2>
+                </div>
+                <div class="admin-topbar-actions">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">
+                        Active Season: <strong style="color:var(--accent-green);">{{ active_season.name if active_season else '2026 Season' }}</strong>
+                    </span>
+                    <a href="{{ url_for('index') }}" class="btn-secondary" style="font-size: 0.8rem; padding: 0.45rem 0.9rem;">
+                        Public Portal &rarr;
+                    </a>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <main class="admin-content">
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-container">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    <span>{{ message }}</span>
+                                    <button type="button" onclick="this.parentElement.remove();" style="background:transparent;border:none;color:inherit;font-size:1.2rem;cursor:pointer;">&times;</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block admin_content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

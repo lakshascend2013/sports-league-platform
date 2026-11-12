@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ league_name }}{% endblock %} | Official Championship</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Stadium Floodlight Lighting Atmosphere -->
+    <div class="stadium-lighting" aria-hidden="true"></div>
+    <div class="pitch-lines-overlay" aria-hidden="true"></div>
+
+    <!-- Site Header & Navigation -->
+    <header class="site-header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Brand Crest & Title -->
+                <a href="{{ url_for('index') }}" class="brand-link">
+                    <div class="brand-crest">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <h1>{{ league_name }}</h1>
+                        <span>Premier League • {{ active_season.year if active_season else current_year }}</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation Menu -->
+                <ul class="desktop-nav">
+                    <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Dashboard</a></li>
+                    <li><a href="{{ url_for('standings') }}" class="nav-link {% if request.endpoint == 'standings' %}active{% endif %}">Standings</a></li>
+                    <li><a href="{{ url_for('fixtures') }}" class="nav-link {% if request.endpoint == 'fixtures' %}active{% endif %}">Fixtures</a></li>
+                    <li><a href="{{ url_for('results') }}" class="nav-link {% if request.endpoint == 'results' %}active{% endif %}">Results</a></li>
+                    <li><a href="{{ url_for('teams') }}" class="nav-link {% if request.endpoint in ['teams', 'team_profile'] %}active{% endif %}">Teams</a></li>
+                    <li><a href="{{ url_for('players') }}" class="nav-link {% if request.endpoint == 'players' %}active{% endif %}">Players</a></li>
+                    <li><a href="{{ url_for('statistics') }}" class="nav-link {% if request.endpoint == 'statistics' %}active{% endif %}">Stats</a></li>
+                    <li><a href="{{ url_for('venues') }}" class="nav-link {% if request.endpoint == 'venues' %}active{% endif %}">Venues</a></li>
+                </ul>
+
+                <!-- Action / Admin Button -->
+                <div class="nav-actions">
+                    {% if is_admin %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn-admin-pill" style="border-color: var(--accent-green); color: var(--accent-green);">
+                            <span class="live-dot" style="width:6px;height:6px;background:var(--accent-green);border-radius:50%;display:inline-block;"></span>
+                            Admin Panel
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn-admin-pill">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Admin Login
+                        </a>
+                    {% endif %}
+                    
+                    <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle navigation menu">
+                        &#9776;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Dropdown -->
+            <div class="mobile-nav-panel" id="mobileNavPanel">
+                <ul class="mobile-nav-list">
+                    <li><a href="{{ url_for('index') }}" class="mobile-nav-link">Dashboard</a></li>
+                    <li><a href="{{ url_for('standings') }}" class="mobile-nav-link">Standings</a></li>
+                    <li><a href="{{ url_for('fixtures') }}" class="mobile-nav-link">Fixtures</a></li>
+                    <li><a href="{{ url_for('results') }}" class="mobile-nav-link">Results</a></li>
+                    <li><a href="{{ url_for('teams') }}" class="mobile-nav-link">Teams</a></li>
+                    <li><a href="{{ url_for('players') }}" class="mobile-nav-link">Players</a></li>
+                    <li><a href="{{ url_for('statistics') }}" class="mobile-nav-link">Statistics</a></li>
+                    <li><a href="{{ url_for('venues') }}" class="mobile-nav-link">Venues</a></li>
+                    {% if is_admin %}
+                        <li><a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link" style="color:var(--accent-green);">Go to Admin Portal</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}" class="mobile-nav-link">Administrator Login</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Page Content -->
+    <main class="page-content">
+        <div class="container" style="padding-top: 1.5rem;">
+            <!-- Flash Notification Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <span>{{ message }}</span>
+                                <button type="button" onclick="this.parentElement.remove();" style="background:transparent;border:none;color:inherit;font-size:1.2rem;cursor:pointer;">&times;</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="brand-link" style="margin-bottom: 1rem;">
+                        <div class="brand-crest" style="width:36px;height:36px;">
+                            <svg viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/></svg>
+                        </div>
+                        <h3 style="font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">{{ league_name }}</h3>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 320px;">
+                        The ultimate high-tempo sports league management engine. Featuring real-time standings, comprehensive player metrics, and stadium analytics.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4>Tournament</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('standings') }}">Points Table</a></li>
+                        <li><a href="{{ url_for('fixtures') }}">Match Schedule</a></li>
+                        <li><a href="{{ url_for('results') }}">Latest Results</a></li>
+                        <li><a href="{{ url_for('statistics') }}">Golden Boot</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Clubs & Stadiums</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('teams') }}">Participating Clubs</a></li>
+                        <li><a href="{{ url_for('players') }}">Player Roster</a></li>
+                        <li><a href="{{ url_for('venues') }}">Stadium Venues</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Administration</h4>
+                    <ul class="footer-links">
+                        {% if is_admin %}
+                            <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+                            <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('login') }}">Official Portal Login</a></li>
+                        {% endif %}
+                        <li><a href="/api/standings" target="_blank">Public Standings API</a></li>
+                        <li><a href="/api/fixtures" target="_blank">Fixtures API</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ current_year }} {{ league_name }}. All rights reserved.</p>
+                <p style="color: var(--text-muted);">Crafted with Python Flask, SQLite, and Electric Neon Design.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

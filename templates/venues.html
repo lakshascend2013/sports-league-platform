@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Stadiums & Venues | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Championship Venues</h2>
+            <p>World-class stadiums hosting the premier football competition</p>
+        </div>
+        {% if is_admin %}
+            <a href="{{ url_for('admin_venues') }}" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+                + Add / Manage Venues
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Venues Grid -->
+    <div class="venues-grid">
+        {% for v in venues %}
+        <div class="venue-card">
+            <div class="venue-photo-wrap">
+                <img src="{{ v.image_url }}" alt="{{ v.name }}" class="venue-photo" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80';">
+                <div class="venue-capacity-badge">
+                    {{ '{:,}'.format(v.capacity) }} Capacity
+                </div>
+            </div>
+            <div class="venue-body">
+                <h3 class="venue-title">{{ v.name }}</h3>
+                <div class="venue-city">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{{ v.city }} &bull; Surface: <strong>{{ v.surface }}</strong></span>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                    {{ v.description or 'A signature venue equipped with stadium floodlighting, media facilities, and premier hybrid pitch.' }}
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 0.75rem; font-size: 0.825rem; color: var(--text-muted);">
+                    <span>Fixtures Hosted: <strong style="color:var(--accent-green);">{{ v.match_count }}</strong></span>
+                    <a href="{{ url_for('fixtures', venue_id=v.id) }}" class="section-link" style="font-size:0.8rem;">
+                        View Fixtures &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

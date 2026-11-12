@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Players & Athletes | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>League Players</h2>
+            <p>Verified athletic performance data, profiles, and statistics</p>
+        </div>
+        {% if is_admin %}
+            <a href="{{ url_for('admin_players') }}" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+                + Add / Manage Players
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter & Search Controls Bar -->
+    <form method="GET" action="{{ url_for('players') }}" class="filter-bar">
+        <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" name="q" placeholder="Search player name or nationality..." value="{{ search_query }}">
+        </div>
+
+        <select name="team_id" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Teams</option>
+            {% for t in teams %}
+                <option value="{{ t.id }}" {% if selected_team == t.id %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="position" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Positions</option>
+            <option value="Forward" {% if selected_position == 'Forward' %}selected{% endif %}>Forwards</option>
+            <option value="Midfielder" {% if selected_position == 'Midfielder' %}selected{% endif %}>Midfielders</option>
+            <option value="Defender" {% if selected_position == 'Defender' %}selected{% endif %}>Defenders</option>
+            <option value="Goalkeeper" {% if selected_position == 'Goalkeeper' %}selected{% endif %}>Goalkeepers</option>
+        </select>
+
+        <select name="sort" class="filter-select" onchange="this.form.submit()">
+            <option value="goals" {% if sort_by == 'goals' %}selected{% endif %}>Sort by Goals</option>
+            <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Sort by Assists</option>
+            <option value="matches" {% if sort_by == 'matches' %}selected{% endif %}>Sort by Matches</option>
+            <option value="clean_sheets" {% if sort_by == 'clean_sheets' %}selected{% endif %}>Sort by Clean Sheets</option>
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+        </select>
+
+        <button type="submit" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.85rem;">Filter</button>
+        {% if search_query or selected_team or selected_position %}
+            <a href="{{ url_for('players') }}" class="btn-secondary" style="padding: 0.65rem 1rem; font-size: 0.85rem;">Reset</a>
+        {% endif %}
+    </form>
+
+    <!-- Players Cards Grid -->
+    <div class="players-grid">
+        {% for p in players %}
+        <div class="player-card">
+            <div class="player-image-wrap">
+                <img src="{{ p.photo_url }}" alt="{{ p.name }}" class="player-img" loading="lazy">
+                <div class="player-jersey-badge">#{{ p.jersey_number }}</div>
+                <div class="player-pos-badge">{{ p.position }}</div>
+            </div>
+            <div class="player-info">
+                <h3 class="player-name">{{ p.name }}</h3>
+                <div class="player-team">
+                    <img src="{{ p.team_logo }}" alt="{{ p.team_name }}" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
+                    <span>{{ p.team_short }} &bull; {{ p.nationality or 'International' }}</span>
+                </div>
+                <div class="player-stats-bar">
+                    <div class="player-stat-col">
+                        <strong>{{ p.goals }}</strong>
+                        <span>Goals</span>
+                    </div>
+                    <div class="player-stat-col">
+                        <strong>{{ p.assists }}</strong>
+                        <span>Assists</span>
+                    </div>
+                    <div class="player-stat-col">
+                        <strong>{{ p.matches_played }}</strong>
+                        <span>Matches</span>
+                    </div>
+                    {% if p.position == 'Goalkeeper' %}
+                    <div class="player-stat-col">
+                        <strong style="color:var(--accent-cyan);">{{ p.clean_sheets }}</strong>
+                        <span>Clean Sheets</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);" class="glass-card">
+            <h3>No athletes found matching the filters.</h3>
+            <p style="margin-top: 0.5rem;">Try adjusting search terms or clear filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Manage Clubs & Teams{% endblock %}
+
+{% block admin_content %}
+<div class="admin-action-bar">
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800;">Registered Championship Clubs</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">Total clubs: {{ teams|length }}</p>
+    </div>
+    <button type="button" class="btn-add" data-open-modal="addTeamModal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Register New Club
+    </button>
+</div>
+
+<!-- Teams Table (Responsive Desktop & Mobile Stacked) -->
+<div class="table-container">
+    <div class="table-scroll-wrapper">
+        <table class="data-table mobile-stacked-table">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Club Name</th>
+                    <th>Code</th>
+                    <th>Head Coach</th>
+                    <th>Home Stadium</th>
+                    <th>Squad Size</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in teams %}
+                <tr>
+                    <td data-label="Logo">
+                        <img src="{{ t.logo_url }}" alt="{{ t.name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #0f172a; border: 1px solid var(--border-glass);">
+                    </td>
+                    <td data-label="Club Name">
+                        <strong style="color: #ffffff;">{{ t.name }}</strong>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Short: {{ t.short_name }}</div>
+                    </td>
+                    <td data-label="Code">
+                        <span style="background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 4px; font-weight: 800; font-size: 0.8rem;">
+                            {{ t.code }}
+                        </span>
+                    </td>
+                    <td data-label="Coach">{{ t.coach }}</td>
+                    <td data-label="Home Stadium" style="color: var(--accent-cyan);">{{ t.venue_name or 'Not Assigned' }}</td>
+                    <td data-label="Squad Size">
+                        <span style="font-weight: 700; color: var(--accent-green);">{{ t.player_count }}</span> players
+                    </td>
+                    <td data-label="Actions" style="text-align: right;">
+                        <div style="display: inline-flex; gap: 8px;">
+                            <button type="button" class="btn-action-sm btn-edit btn-edit-team"
+                                data-id="{{ t.id }}"
+                                data-name="{{ t.name }}"
+                                data-short-name="{{ t.short_name }}"
+                                data-code="{{ t.code }}"
+                                data-coach="{{ t.coach }}"
+                                data-founded="{{ t.founded_year }}"
+                                data-venue-id="{{ t.home_venue_id }}"
+                                data-primary-color="{{ t.primary_color }}"
+                                data-secondary-color="{{ t.secondary_color }}"
+                                data-logo-url="{{ t.logo_url }}"
+                                data-bio="{{ t.bio }}">
+                                Edit
+                            </button>
+                            <form method="POST" action="{{ url_for('admin_delete_team', team_id=t.id) }}" style="display: inline;" data-confirm-delete="Delete club '{{ t.name }}'? This action cannot be undone.">
+                                <button type="submit" class="btn-action-sm btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        No clubs registered yet. Click "Register New Club" above.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL: ADD CLUB -->
+<div class="modal-overlay" id="addTeamModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Register New Championship Club</h3>
+            <button type="button" class="modal-close-btn" data-close-modal>&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('admin_teams') }}">
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Full Club Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Metro Dynamos FC" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Short Name *</label>
+                        <input type="text" name="short_name" class="form-control" placeholder="e.g. Metro Dynamos" required>
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Club Code (3-4 Letters) *</label>
+                        <input type="text" name="code" class="form-control" placeholder="e.g. MDF" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Head Coach *</label>
+                        <input type="text" name="coach" class="form-control" placeholder="e.g. Roberto De Silva" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Founded Year</label>
+                        <input type="number" name="founded_year" class="form-control" placeholder="e.g. 2005" value="2000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Home Venue / Stadium</label>
+                    <select name="home_venue_id" class="form-control">
+                        <option value="">-- Select Stadium --</option>
+                        {% for v in venues %}
+                            <option value="{{ v.id }}">{{ v.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Primary Brand Color</label>
+                        <input type="color" name="primary_color" class="form-control" value="#00ff87" style="height: 42px; padding: 2px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Secondary Brand Color</label>
+                        <input type="color" name="secondary_color" class="form-control" value="#0a192f" style="height: 42px; padding: 2px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Logo / Crest Image URL</label>
+                    <input type="url" name="logo_url" class="form-control" placeholder="https://..." value="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=300&q=80">
+                </div>
+
+                <div class="form-group">
+                    <label>Club Bio & Lore</label>
+                    <textarea name="bio" class="form-control" rows="3" placeholder="Brief history and philosophy..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-primary">Save Club</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: EDIT CLUB -->
+<div class="modal-overlay" id="editTeamModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Championship Club</h3>
+            <button type="button" class="modal-close-btn" data-close-modal>&times;</button>
+        </div>
+        <form method="POST" id="editTeamForm" action="">
+            <div class="modal-body">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Full Club Name *</label>
+                        <input type="text" id="edit_team_name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Short Name *</label>
+                        <input type="text" id="edit_team_short_name" name="short_name" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Club Code *</label>
+                        <input type="text" id="edit_team_code" name="code" class="form-control" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Head Coach *</label>
+                        <input type="text" id="edit_team_coach" name="coach" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Founded Year</label>
+                        <input type="number" id="edit_team_founded" name="founded_year" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Home Venue</label>
+                    <select id="edit_team_venue" name="home_venue_id" class="form-control">
+                        <option value="">-- Select Stadium --</option>
+                        {% for v in venues %}
+                            <option value="{{ v.id }}">{{ v.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Primary Brand Color</label>
+                        <input type="color" id="edit_team_primary_color" name="primary_color" class="form-control" style="height: 42px; padding: 2px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Secondary Brand Color</label>
+                        <input type="color" id="edit_team_secondary_color" name="secondary_color" class="form-control" style="height: 42px; padding: 2px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Logo / Crest URL</label>
+                    <input type="url" id="edit_team_logo_url" name="logo_url" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Club Bio & Lore</label>
+                    <textarea id="edit_team_bio" name="bio" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+                <button type="submit" class="btn-primary">Update Club</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

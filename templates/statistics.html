@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}League Analytics & Statistics | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Season Analytics & Leaderboards</h2>
+            <p>Official player performance metrics, top attacking clubs, and defensive records</p>
+        </div>
+    </div>
+
+    <!-- PLAYER LEADERBOARDS: 3-COLUMN GRID -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.75rem; margin-bottom: 4rem;" class="stats-three-col">
+        <!-- 1. Golden Boot (Top Goals) -->
+        <div class="glass-card" style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: var(--accent-gold);">⚽</span> Golden Boot
+                </h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Goals</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for p in top_scorers[:7] %}
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: 800; width: 22px; color: {% if loop.index == 1 %}var(--accent-gold){% elif loop.index == 2 %}#cbd5e1{% elif loop.index == 3 %}#cd7f32{% else %}var(--text-muted){% endif %};">
+                            #{{ loop.index }}
+                        </span>
+                        <img src="{{ p.photo_url }}" alt="{{ p.name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" loading="lazy">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.85rem;">{{ p.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ p.team_short }}</div>
+                        </div>
+                    </div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: var(--accent-green); font-family: var(--font-mono);">
+                        {{ p.goals }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 2. Playmaker (Top Assists) -->
+        <div class="glass-card" style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: var(--accent-cyan);">🎯</span> Top Playmakers
+                </h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Assists</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for p in top_assists[:7] %}
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: 800; width: 22px; color: {% if loop.index == 1 %}var(--accent-cyan){% else %}var(--text-muted){% endif %};">
+                            #{{ loop.index }}
+                        </span>
+                        <img src="{{ p.photo_url }}" alt="{{ p.name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" loading="lazy">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.85rem;">{{ p.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ p.team_short }}</div>
+                        </div>
+                    </div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: var(--accent-cyan); font-family: var(--font-mono);">
+                        {{ p.assists }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. Safe Hands (Clean Sheets) -->
+        <div class="glass-card" style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 0.75rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #38bdf8;">🧤</span> Safe Hands (GK)
+                </h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Clean Sheets</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for p in clean_sheets[:7] %}
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: 800; width: 22px; color: var(--text-muted);">
+                            #{{ loop.index }}
+                        </span>
+                        <img src="{{ p.photo_url }}" alt="{{ p.name }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" loading="lazy">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.85rem;">{{ p.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ p.team_short }}</div>
+                        </div>
+                    </div>
+                    <span style="font-weight: 900; font-size: 1.1rem; color: #38bdf8; font-family: var(--font-mono);">
+                        {{ p.clean_sheets }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- TEAM ATTACK & DEFENSE RANKINGS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;" class="dashboard-duo-grid">
+        <!-- Highest Scoring Teams -->
+        <div>
+            <div class="section-header">
+                <div class="section-header-left">
+                    <h2>Most Lethal Attacks</h2>
+                    <p>Clubs with the highest goals scored this season</p>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Club</th>
+                            <th>Played</th>
+                            <th>Goals Scored</th>
+                            <th>Avg / Match</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in top_attack[:6] %}
+                        <tr>
+                            <td><strong style="color:var(--accent-green);">#{{ loop.index }}</strong></td>
+                            <td>
+                                <div class="table-team-cell">
+                                    <img src="{{ t.logo_url }}" alt="{{ t.name }}" class="table-team-logo">
+                                    <span>{{ t.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ t.played }}</td>
+                            <td class="stat-bold" style="color:var(--accent-green);">{{ t.goals_for }}</td>
+                            <td>{{ '%.2f' % (t.goals_for / t.played) if t.played > 0 else '0.00' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Best Defensive Records -->
+        <div>
+            <div class="section-header">
+                <div class="section-header-left">
+                    <h2>Ironclad Defenses</h2>
+                    <p>Clubs conceding the fewest goals per game</p>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Club</th>
+                            <th>Played</th>
+                            <th>Conceded</th>
+                            <th>Win %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in top_defense[:6] %}
+                        <tr>
+                            <td><strong style="color:var(--accent-cyan);">#{{ loop.index }}</strong></td>
+                            <td>
+                                <div class="table-team-cell">
+                                    <img src="{{ t.logo_url }}" alt="{{ t.name }}" class="table-team-logo">
+                                    <span>{{ t.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ t.played }}</td>
+                            <td class="stat-bold" style="color:#ffffff;">{{ t.goals_against }}</td>
+                            <td style="color:var(--accent-green); font-weight:700;">{{ t.win_rate }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media (max-width: 1024px) {
+    .stats-three-col {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

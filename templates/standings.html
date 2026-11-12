@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Standings & Points Table | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Championship Standings</h2>
+            <p>Official points table calculated in real-time from completed match results</p>
+        </div>
+        <div>
+            <span class="hero-badge" style="margin-bottom:0;">
+                <span class="live-dot"></span> Season {{ active_season.year if active_season else current_year }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Zone Legend -->
+    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 3px; display: inline-block;"></span>
+            <span>1st: Champion & Super Cup Qualifier</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 12px; height: 12px; background: var(--accent-cyan); border-radius: 3px; display: inline-block;"></span>
+            <span>2nd - 4th: Continental Cup Qualifier</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 12px; height: 12px; background: var(--accent-red); border-radius: 3px; display: inline-block;"></span>
+            <span>Bottom 2: Relegation Playoff Zone</span>
+        </div>
+    </div>
+
+    <!-- Standings Table (Desktop Table & Mobile Stacked Friendly) -->
+    <div class="table-container">
+        <div class="table-scroll-wrapper">
+            <table class="data-table mobile-stacked-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">Pos</th>
+                        <th>Club</th>
+                        <th class="th-sortable" title="Click to sort by Played">P</th>
+                        <th class="th-sortable" title="Click to sort by Won">W</th>
+                        <th class="th-sortable" title="Click to sort by Drawn">D</th>
+                        <th class="th-sortable" title="Click to sort by Lost">L</th>
+                        <th class="th-sortable" title="Click to sort by Goals For">GF</th>
+                        <th class="th-sortable" title="Click to sort by Goals Against">GA</th>
+                        <th class="th-sortable" title="Click to sort by Goal Difference">GD</th>
+                        <th class="th-sortable" title="Click to sort by Points">PTS</th>
+                        <th>Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in standings %}
+                    <tr style="border-left: 4px solid {% if t.position == 1 %}var(--accent-green){% elif t.position <= 4 %}var(--accent-cyan){% elif t.zone == 'relegation' %}var(--accent-red){% else %}transparent{% endif %};">
+                        <td data-label="Position">
+                            <span class="standings-pos {% if t.position == 1 %}pos-champion{% elif t.position <= 4 %}pos-continental{% elif t.zone == 'relegation' %}pos-relegation{% endif %}">
+                                {{ t.position }}
+                            </span>
+                        </td>
+                        <td data-label="Club">
+                            <div class="table-team-cell">
+                                <img src="{{ t.logo_url }}" alt="{{ t.name }}" class="table-team-logo" loading="lazy">
+                                <div>
+                                    <a href="{{ url_for('team_profile', team_id=t.team_id) }}" style="color:#ffffff; text-decoration:none; font-weight:700;">
+                                        {{ t.name }}
+                                    </a>
+                                    <span style="font-size:0.75rem; color:var(--text-muted); margin-left:6px;">({{ t.code }})</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Played" class="stat-bold">{{ t.played }}</td>
+                        <td data-label="Won">{{ t.won }}</td>
+                        <td data-label="Drawn">{{ t.drawn }}</td>
+                        <td data-label="Lost">{{ t.lost }}</td>
+                        <td data-label="GF">{{ t.goals_for }}</td>
+                        <td data-label="GA">{{ t.goals_against }}</td>
+                        <td data-label="GD" class="stat-bold" style="color: {% if t.goal_difference > 0 %}var(--accent-green){% elif t.goal_difference < 0 %}var(--accent-red){% else %}inherit{% endif %};">
+                            {{ '%+d' % t.goal_difference if t.goal_difference != 0 else '0' }}
+                        </td>
+                        <td data-label="Points" class="stat-points">{{ t.points }}</td>
+                        <td data-label="Recent Form">
+                            <div class="form-badges-list">
+                                {% for f in t.form_last5 %}
+                                    <span class="form-badge {% if f.result == 'W' %}form-w{% elif f.result == 'D' %}form-d{% else %}form-l{% endif %}" title="{{ f.opponent }} ({{ f.score }})">
+                                        {{ f.result }}
+                                    </span>
+                                {% else %}
+                                    <span style="color:var(--text-muted);font-size:0.8rem;">-</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No team standings found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

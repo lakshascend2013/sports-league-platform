@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Match Schedule & Fixtures | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Fixtures & Match Schedule</h2>
+            <p>Official schedule for upcoming and live tournament encounters</p>
+        </div>
+        {% if is_admin %}
+            <a href="{{ url_for('admin_fixtures') }}" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+                + Schedule Match
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter Bar -->
+    <form method="GET" action="{{ url_for('fixtures') }}" class="filter-bar">
+        <select name="team_id" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Teams</option>
+            {% for t in teams %}
+                <option value="{{ t.id }}" {% if selected_team == t.id %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="venue_id" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Venues</option>
+            {% for v in venues %}
+                <option value="{{ v.id }}" {% if selected_venue == v.id %}selected{% endif %}>{{ v.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Scheduled & Live</option>
+            <option value="live" {% if selected_status == 'live' %}selected{% endif %}>Live Only</option>
+            <option value="scheduled" {% if selected_status == 'scheduled' %}selected{% endif %}>Scheduled Only</option>
+        </select>
+
+        <button type="submit" class="btn-primary" style="padding: 0.65rem 1.2rem; font-size: 0.85rem;">Apply Filter</button>
+        {% if selected_team or selected_venue or selected_status %}
+            <a href="{{ url_for('fixtures') }}" class="btn-secondary" style="padding: 0.65rem 1rem; font-size: 0.85rem;">Reset</a>
+        {% endif %}
+    </form>
+
+    <!-- Fixtures Grid -->
+    <div class="fixtures-grid">
+        {% for m in matches %}
+        <div class="glass-card match-card" style="{% if m.status == 'live' %}border-color: rgba(255, 42, 95, 0.45);{% endif %}">
+            <div class="match-header">
+                <span>Round {{ m.round }}</span>
+                {% if m.status == 'live' %}
+                    <span class="match-status-badge badge-live">{{ m.minute }}' LIVE</span>
+                {% else %}
+                    <span class="match-status-badge badge-scheduled">UPCOMING</span>
+                {% endif %}
+            </div>
+
+            <div class="match-teams-row">
+                <div class="match-team team-home">
+                    <span class="match-team-name">{{ m.home_short }}</span>
+                    <img src="{{ m.home_logo }}" alt="{{ m.home_name }}" class="match-team-logo" loading="lazy">
+                </div>
+
+                <div class="match-scoreboard">
+                    {% if m.status == 'live' %}
+                        <div class="score-display score-live">{{ m.home_score }} - {{ m.away_score }}</div>
+                        <span class="match-minute">Live in Play ({{ m.minute }}')</span>
+                    {% else %}
+                        <div class="match-time-display">{{ m.match_time|format_time }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="match-team team-away">
+                    <img src="{{ m.away_logo }}" alt="{{ m.away_name }}" class="match-team-logo" loading="lazy">
+                    <span class="match-team-name">{{ m.away_short }}</span>
+                </div>
+            </div>
+
+            {% if m.summary %}
+            <div style="font-size: 0.825rem; color: var(--text-secondary); background: rgba(5,10,20,0.5); padding: 0.65rem; border-radius: 6px; line-height: 1.4;">
+                {{ m.summary }}
+            </div>
+            {% endif %}
+
+            <div class="match-footer">
+                <div class="match-venue">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>{{ m.venue_name }} ({{ m.venue_city }})</span>
+                </div>
+                <span style="font-weight: 700; color: var(--accent-cyan);">{{ m.match_date|format_date }}</span>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: var(--text-muted);" class="glass-card">
+            <h3>No fixtures found for the selected filters.</h3>
+            <p style="margin-top: 0.5rem;"><a href="{{ url_for('fixtures') }}" style="color:var(--accent-green);">View all scheduled fixtures</a></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

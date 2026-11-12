@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Authentication | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div style="min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+    <div class="glass-card" style="width: 100%; max-width: 440px; padding: 2.5rem; border-color: var(--border-glow); box-shadow: var(--shadow-glow);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div class="brand-crest" style="margin: 0 auto 1.25rem; width: 56px; height: 56px;">
+                <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; fill: #050a14;">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                </svg>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 800; text-transform: uppercase;">Admin Portal</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 4px;">Authorized league management access only</p>
+        </div>
+
+        <!-- Demo Credentials Hint Box -->
+        <div style="background: rgba(0, 255, 135, 0.08); border: 1px solid rgba(0, 255, 135, 0.25); border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1.5rem; font-size: 0.8rem;">
+            <div style="font-weight: 800; color: var(--accent-green); margin-bottom: 4px;">DEMO CREDENTIALS:</div>
+            <div style="color: var(--text-secondary);">Username / Email: <code style="color: #ffffff;">admin@sportsleague.com</code></div>
+            <div style="color: var(--text-secondary);">Password: <code style="color: #ffffff;">Admin@2026!</code></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Email or Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="admin@sportsleague.com" required autocomplete="username">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.75rem;">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
+                Authenticate & Enter &rarr;
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+            Protected by Argon2/SHA-256 password hashing & secure Flask session controls.
+        </div>
+    </div>
+</div>
+{% endblock %}

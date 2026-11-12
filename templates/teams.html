@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Participating Clubs | {{ league_name }}{% endblock %}
+
+{% block content %}
+<div class="section-wrapper">
+    <div class="section-header">
+        <div class="section-header-left">
+            <h2>Championship Clubs</h2>
+            <p>Official clubs competing in the {{ current_year }} season</p>
+        </div>
+        {% if is_admin %}
+            <a href="{{ url_for('admin_teams') }}" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+                + Add / Manage Teams
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Live Search & Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="quickFilterInput" placeholder="Search clubs by name, code, or head coach..." value="{{ search_query }}">
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.9rem;">
+            Showing <strong>{{ teams|length }}</strong> clubs
+        </div>
+    </div>
+
+    <!-- Teams Grid -->
+    <div class="teams-grid">
+        {% for t in teams %}
+        <div class="team-card" data-search-target="{{ t.name }} {{ t.short_name }} {{ t.code }} {{ t.coach }} {{ t.venue_name }}">
+            <div class="team-card-banner" style="background-image: url('{{ t.logo_url }}');"></div>
+            <div class="team-card-body">
+                <img src="{{ t.logo_url }}" alt="{{ t.name }}" class="team-card-crest" loading="lazy">
+                
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <h3 class="team-card-title">{{ t.name }}</h3>
+                    <span style="font-weight:800; font-size:0.8rem; background:rgba(255,255,255,0.08); padding:2px 8px; border-radius:4px;">{{ t.code }}</span>
+                </div>
+
+                <div class="team-card-coach">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>Coach: <strong>{{ t.coach }}</strong></span>
+                </div>
+
+                <div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"></path></svg>
+                    <span>{{ t.venue_name or 'Home Stadium' }}</span>
+                </div>
+
+                <!-- Metrics Summary Row -->
+                <div class="team-metrics-row">
+                    <div>
+                        <div class="team-metric-val">{{ t.played }}</div>
+                        <div class="team-metric-lbl">Played</div>
+                    </div>
+                    <div>
+                        <div class="team-metric-val" style="color:var(--accent-green);">{{ t.won }}</div>
+                        <div class="team-metric-lbl">Wins</div>
+                    </div>
+                    <div>
+                        <div class="team-metric-val">{{ t.points }}</div>
+                        <div class="team-metric-lbl">Points</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
+                    <span style="font-size:0.8rem; color:var(--text-muted);">
+                        Roster: <strong>{{ t.player_count }}</strong> players
+                    </span>
+                    <a href="{{ url_for('team_profile', team_id=t.id) }}" class="btn-secondary" style="padding:0.4rem 0.9rem; font-size:0.8rem;">
+                        View Profile &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
