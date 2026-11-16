@@ -69,18 +69,25 @@
             <!-- Mobile Navigation Dropdown -->
             <div class="mobile-nav-panel" id="mobileNavPanel">
                 <ul class="mobile-nav-list">
-                    <li><a href="{{ url_for('index') }}" class="mobile-nav-link">Dashboard</a></li>
-                    <li><a href="{{ url_for('standings') }}" class="mobile-nav-link">Standings</a></li>
-                    <li><a href="{{ url_for('fixtures') }}" class="mobile-nav-link">Fixtures</a></li>
-                    <li><a href="{{ url_for('results') }}" class="mobile-nav-link">Results</a></li>
-                    <li><a href="{{ url_for('teams') }}" class="mobile-nav-link">Teams</a></li>
-                    <li><a href="{{ url_for('players') }}" class="mobile-nav-link">Players</a></li>
-                    <li><a href="{{ url_for('statistics') }}" class="mobile-nav-link">Statistics</a></li>
-                    <li><a href="{{ url_for('venues') }}" class="mobile-nav-link">Venues</a></li>
+                    <li><a href="{{ url_for('index') }}" class="mobile-nav-link {% if request.endpoint == 'index' %}active{% endif %}">🏠 Dashboard</a></li>
+                    <li><a href="{{ url_for('standings') }}" class="mobile-nav-link {% if request.endpoint == 'standings' %}active{% endif %}">🏆 Standings</a></li>
+                    <li><a href="{{ url_for('fixtures') }}" class="mobile-nav-link {% if request.endpoint == 'fixtures' %}active{% endif %}">📅 Fixtures</a></li>
+                    <li><a href="{{ url_for('results') }}" class="mobile-nav-link {% if request.endpoint == 'results' %}active{% endif %}">⚽ Results</a></li>
+                    <li><a href="{{ url_for('teams') }}" class="mobile-nav-link {% if request.endpoint in ['teams', 'team_profile'] %}active{% endif %}">🛡️ Teams</a></li>
+                    <li><a href="{{ url_for('players') }}" class="mobile-nav-link {% if request.endpoint == 'players' %}active{% endif %}">👤 Players</a></li>
+                    <li><a href="{{ url_for('statistics') }}" class="mobile-nav-link {% if request.endpoint == 'statistics' %}active{% endif %}">📊 Statistics</a></li>
+                    <li><a href="{{ url_for('venues') }}" class="mobile-nav-link {% if request.endpoint == 'venues' %}active{% endif %}">🏟️ Venues</a></li>
+                    <li class="mobile-nav-divider"></li>
                     {% if is_admin %}
-                        <li><a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link" style="color:var(--accent-green);">Go to Admin Portal</a></li>
+                        <li><a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link mobile-admin-link">
+                            <span style="width:8px;height:8px;background:var(--accent-green);border-radius:50%;display:inline-block;box-shadow:0 0 6px var(--accent-green);"></span>
+                            Admin Panel — Active
+                        </a></li>
+                        <li><a href="{{ url_for('logout') }}" class="mobile-nav-link" style="color:var(--accent-red);">🚪 Sign Out</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('login') }}" class="mobile-nav-link">Administrator Login</a></li>
+                        <li><a href="{{ url_for('login') }}" class="mobile-nav-link mobile-admin-link">
+                            🔐 Admin Login
+                        </a></li>
                     {% endif %}
                 </ul>
             </div>
