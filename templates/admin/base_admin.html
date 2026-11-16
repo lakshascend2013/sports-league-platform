@@ -142,6 +142,41 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+    // Mobile sidebar overlay toggle
+    (function() {
+        var toggleBtn = document.getElementById('adminSidebarToggle');
+        var sidebar = document.querySelector('.admin-sidebar');
+        // Create overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            toggleBtn.innerHTML = '&times;';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            toggleBtn.innerHTML = '&#9776;';
+        }
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            });
+        }
+        overlay.addEventListener('click', closeSidebar);
+        // Close sidebar when a nav link is clicked on mobile
+        var navLinks = sidebar ? sidebar.querySelectorAll('a') : [];
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) closeSidebar();
+            });
+        });
+    })();
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

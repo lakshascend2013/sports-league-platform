@@ -423,6 +423,90 @@
         display: block;
     }
     .admin-content {
-        padding: 1.25rem;
+        padding: 1rem;
     }
+    /* Hide topbar right section — saves space on mobile */
+    .admin-topbar-actions {
+        display: none;
+    }
+    .admin-topbar {
+        padding: 0 1rem;
+        height: 60px;
+    }
+    /* Stack form grids */
+    .form-row-2,
+    .form-row-3 {
+        grid-template-columns: 1fr !important;
+    }
+    /* Admin stats grid 2-col */
+    .admin-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.75rem !important;
+    }
+    /* Table horizontal scroll */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    /* Section header stack */
+    .section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    .section-header .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    /* Action bar stack on mobile */
+    .admin-action-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .admin-action-bar > div:last-child {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    .admin-action-bar .btn-add,
+    .admin-action-bar .filter-select {
+        width: 100% !important;
+    }
+    .admin-action-bar form {
+        width: 100% !important;
+    }
+    .admin-action-bar select {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 540px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .admin-topbar-left h2 {
+        font-size: 0.95rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    .admin-content {
+        padding: 0.75rem;
+    }
+    .data-table td .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
+    }
+}
+
+/* Dark overlay when sidebar opens on mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 89;
+}
+.sidebar-overlay.active {
+    display: block;
 }
